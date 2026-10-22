@@ -1,62 +1,20 @@
-# Serve-Type Classification from Motion Capture
+# Tennis serve classification (revised analysis)
 
-Code accompanying the paper "What Distinguishes a Kick, Slice and Flat Serve? Comparing Joint Range of Motion Against Racket Speed in a Single-Player Motion Capture Study."
+Code for the paper *What Distinguishes a Kick, Slice and Flat Serve? Joint Range of Motion Versus Racket Speed in a Single-Player Pilot Study of Shadow Serves* (Siddhanth Ganesh).
 
-This project asks whether a machine learning model can tell a kick, slice, and flat tennis serve apart using motion-capture measurements of the server's body, and, more importantly, whether the answer comes from how far the joints move (range of motion) or from how fast the racket is swinging.
+## Revised analysis (used in the current paper)
 
-## Data
+| File | What it produces |
+|---|---|
+| `revised_analysis.py` | All main results: leave-one-recording-out accuracy, balanced accuracy, precision/recall/F1, macro- and weighted-F1, cluster-bootstrap confidence intervals, the racket-speed-only and joint-ROM-only comparisons, the exclusion-threshold sensitivity tables, and out-of-fold permutation importance. Primary dataset: 43 serves (duplicate pairs removed); sensitivity: 51 serves. |
+| `diff_check.py` | Bootstrap intervals for the change in accuracy when joint ROM variables are added to racket speed. |
+| `speed_check.py` | Racket-speed ranges by serve type and the number of serves in each speed-overlap band. |
+| `make_figures.py` | Figures 4–6 (confusion matrices, permutation importance, racket speed by serve type). |
 
-The raw data are three spreadsheets exported from the motion-capture lab's OpenSim processing pipeline, one per serve type:
+All settings are fixed in the code (random forest: 500 trees, `min_samples_leaf=2`, seed 1; logistic regression: L2, C = 1, lbfgs, inside a pipeline with standardisation so scaling is fitted on training folds only). No hyperparameter tuning and no class weighting. Written for Python 3 with scikit-learn 1.9.1, pandas, NumPy and matplotlib.
 
-- kick_serve_data__1_.xlsx
-- slice_serve_IK_report__1_.xlsx
-- Flat_Serve_IK_Report__1___1_.xlsx
+The scripts read `serves_all70_flagged.csv`, the processed serve-level dataset, which is available from the author on request.
 
-These must be placed in the same folder as the scripts before running anything.
+## Earlier version
 
-## Repository structure
-
-All files sit in one folder:
-
-model_pipeline.py (builds the dataset and runs the classifier), figure1_whole_body_compression.py, figure2_exclusion_thresholds.py, figure3_exclusions_by_type.py, figure4_confusion_matrix.py, figure5_variable_importance.py, figure6_elbow_threshold_sensitivity.py, figure7_knee_threshold_sensitivity.py, README.md
-
-## How to run
-
-Step 1, run this first: model_pipeline.py reads the three .xlsx files, consolidates them into one table of 70 serves, applies the two exclusion thresholds described below, fits the models, and prints all the headline results (accuracy, confusion matrix, variable importance, sensitivity tables). It also writes out serves_all70_flagged.csv in the same folder, which every figure script needs.
-
-python model_pipeline.py
-
-Step 2, figures: Each figureN_*.py script reads serves_all70_flagged.csv from the same folder and produces one figure as a PNG. Once step 1 has run, each figure script can be run independently, for example:
-
-python figure5_variable_importance.py
-
-Figures 6 and 7 each retrain several random forests to test different threshold values, so they take noticeably longer to run than the others (roughly a minute); this is expected, not a bug.
-
-## Requirements
-
-pandas, numpy, scikit-learn, matplotlib, openpyxl
-
-Install with:
-
-pip install pandas numpy scikit-learn matplotlib openpyxl
-
-## Method summary
-
-- 90 serves (30 kick, 30 slice, 30 flat) were recorded; automatic event detection identified 70.
-- Serves affected by marker occlusion were excluded using two thresholds set from published serve kinematics, not from this dataset: right-elbow flexion ROM below 55 degrees, or either knee's flexion ROM below 40 degrees. This leaves 51 serves (20 kick, 19 slice, 12 flat).
-- The model uses 15 variables: racket-tip speed, elbow pronation/supination, 3 lumbar variables, and 10 leg variables. Elbow flexion and both knee flexion variables are deliberately excluded as predictors, since they were used to decide which serves to keep, and using them again to predict serve type would be circular.
-- Two classifiers are compared: a random forest and logistic regression, evaluated with leave-one-recording-out cross-validation (never random splits, since serves from the same recording share too much in common, which inflates accuracy if mixed across train/test).
-
-## Headline results
-
-Random forest: 70.6%
-Logistic regression: 68.6%
-Always guess the largest class (no-information rate): 39.2%
-Racket-tip speed alone: 72.5%
-14 joint ROM variables, without racket speed: 33 to 37%
-
-Racket-tip speed alone matches or exceeds the full 15-variable model. Joint range of motion adds essentially nothing once racket speed is known, which is the central finding of the paper.
-
-## AI use disclosure
-
-Claude (Anthropic) was used extensively in this project for code generation and data analysis, and gave assistance in drafting and editing the paper manuscript.
+`model_pipeline.py` and the `figure*` scripts are from the earlier version of the analysis (51 serves, impurity-based importance) and are kept for reference only. They do not produce the numbers in the current paper.
