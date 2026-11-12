@@ -5,7 +5,7 @@ FIGURE 1 — Whole-body compression among excluded vs. retained serves
 For each of the 70 serves, counts how many of 14 joint range-of-motion (ROM)
 variables fall below half that variable's "normal" value (the median among
 the 51 retained serves). Plots a grouped histogram comparing this count for
-retained serves vs. serves excluded for marker occlusion.
+retained serves vs. serves excluded for implausible ROM values.
 
 This shows that excluded serves are compressed across MANY joints at once,
 not only at the joint(s) used to define the exclusion thresholds.
@@ -50,7 +50,7 @@ fig, ax = plt.subplots(figsize=(9, 6))
 x = np.arange(15)
 width = 0.4
 ax.bar(x - width / 2, counts_retained.values, width, color="#2E5A88", label="Retained")
-ax.bar(x + width / 2, counts_excluded.values, width, color="#C0392B", label="Excluded (marker occlusion)")
+ax.bar(x + width / 2, counts_excluded.values, width, color="#C0392B", label="Excluded (implausible ROM values)")
 ax.set_xlabel("Number of the 14 joint ROM variables below half their normal value", fontsize=12)
 ax.set_ylabel("Number of serves", fontsize=12)
 ax.set_xticks(x)

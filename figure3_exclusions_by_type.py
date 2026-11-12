@@ -3,7 +3,7 @@
 FIGURE 3 — Serves excluded by type
 =============================================================================
 Bar chart showing, for each serve type, how many serves were retained vs.
-excluded for marker occlusion. Marker occlusion affected flat and slice
+excluded for implausible ROM values. These affected flat and slice
 serves far more than kick serves, matching the laboratory's own report of
 when markers were lost.
 
@@ -31,7 +31,7 @@ COLORS = {"kick": "#2E5A88", "slice": "#E07A2F", "flat": "#4C9F70"}
 counts = df.groupby(["serve_type", "bad_capture"]).size().unstack(fill_value=0).reindex(TYPES)
 
 fig, ax = plt.subplots(figsize=(7.5, 6))
-ax.bar([t.capitalize() for t in TYPES], counts[False], color=[COLORS[t] for t in TYPES],
+ax.bar([t.capitalize() for t in TYPES], counts[False], color="#2E5A88",
        label="Retained", width=0.6)
 ax.bar([t.capitalize() for t in TYPES], counts[True], bottom=counts[False],
        color="#C0392B", alpha=0.8, label="Excluded", width=0.6)
