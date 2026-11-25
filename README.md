@@ -6,7 +6,7 @@ Code for the paper *What Distinguishes a Kick, Slice and Flat Serve? Joint Range
 
 The laboratory's joint-angle files (OpenSim `.mot`) were checked against the raw marker files (`.trc`). Eight of the 15 files used for the original reports were copies of other recordings: the five flat files and slice files 2–4 contained kick-serve data. As a result, the joint values for 40 of the 70 serves came from the wrong recordings. That error caused all 19 "implausible" serves and all four duplicated pairs in the first version. The laboratory reran inverse kinematics on the eight recordings. Every joint value was then recomputed from the corrected files, and the analysis now uses all 70 serves without exclusions.
 
-The exclusion-threshold scripts and figures from the earlier version (`figure1_whole_body_compression.py`, `figure3_exclusions_by_type.py`, `figureS1_marker_vs_lab_elbow.py`, `raw_marker_check.py`, `sensitivity_without_forearm.py`) no longer apply and have been removed.
+All scripts from the earlier versions of the analysis (the exclusion thresholds, duplicate removal and their figures) no longer apply and have been removed.
 
 ## Files
 
@@ -20,6 +20,10 @@ The exclusion-threshold scripts and figures from the earlier version (`figure1_w
 | `binary_and_incremental.py` | Kick against the other two types, slice against flat, the gain from adding ROM to racket speed, and the speed-overlap counts |
 | `sensitivity.py` | Supplementary Table S1: without forearm pronation/supination, median-filtered angles, and trunk and leg ROM only |
 | `make_figures.py` | Figures 1–5 and Supplementary Figure S1 |
+
+## Figures
+
+The figures used in the paper (Figures 1–5 and Supplementary Figure S1) are in the `figures` folder.
 
 ## Running
 
