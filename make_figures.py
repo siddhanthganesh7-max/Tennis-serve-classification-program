@@ -52,25 +52,27 @@ for i,t in enumerate(TYPES):
 ax.set_yticks(range(3)); ax.set_yticklabels([f"{t.capitalize()} (n = {(d.serve_type==t).sum()})" for t in TYPES],fontsize=11)
 ax.set_xlabel("Peak racket-tip speed (m/s)",fontsize=11); ax.invert_yaxis(); ax.spines[["top","right"]].set_visible(False)
 plt.tight_layout(); plt.savefig("figs/Figure5.png",dpi=300,bbox_inches="tight"); plt.close()
-# Figure 4: four ROM variables by type
+# Figure 4: four ROM variables by type (2 x 2 grid)
 V=["EL_flex","EL_prosup","LB_rot","R_HI_rot"]
-fig,axs=plt.subplots(1,4,figsize=(13,3.8))
+fig,axs=plt.subplots(2,2,figsize=(9,7.6)); axs=axs.ravel()
 for ax,v in zip(axs,V):
     for i,t in enumerate(TYPES):
-        s=d[d.serve_type==t][v]; ax.scatter(np.full(len(s),i)+rng.uniform(-0.15,0.15,len(s)),s,color=COL[t],s=30,edgecolor="white",lw=0.5)
-        ax.plot([i-0.25,i+0.25],[s.median()]*2,color="k",lw=1.6)
-    ax.set_xticks(range(3)); ax.set_xticklabels([t.capitalize() for t in TYPES],fontsize=10.5)
-    ax.set_title(LABEL[v],fontsize=10.5); ax.set_ylabel("ROM (°)",fontsize=10); ax.spines[["top","right"]].set_visible(False)
-plt.tight_layout(); plt.savefig("figs/Figure4.png",dpi=300,bbox_inches="tight"); plt.close()
-# Figure S1: all 17 ROM variables
+        s=d[d.serve_type==t][v]; ax.scatter(np.full(len(s),i)+rng.uniform(-0.17,0.17,len(s)),s,color=COL[t],s=36,edgecolor="white",lw=0.5)
+        ax.plot([i-0.28,i+0.28],[s.median()]*2,color="k",lw=2)
+    ax.set_xticks(range(3)); ax.set_xticklabels(["Kick","Slice","Flat"],fontsize=12); ax.tick_params(axis="y",labelsize=11)
+    ax.set_title(LABEL[v],fontsize=13); ax.set_ylabel("Range of motion (°)",fontsize=11.5); ax.spines[["top","right"]].set_visible(False); ax.set_xlim(-0.6,2.6)
+plt.tight_layout(h_pad=2.2,w_pad=2.5); plt.savefig("figs/Figure4.png",dpi=300,bbox_inches="tight"); plt.close()
+# Figure S1: all 17 ROM variables (5 x 4 grid)
+import textwrap
 ROM=[k for k in LABEL if k!="racket_speed"]
-fig,axs=plt.subplots(3,6,figsize=(16,8.5)); axs=axs.ravel()
+fig,axs=plt.subplots(5,4,figsize=(10,13)); axs=axs.ravel()
 for ax,v in zip(axs,ROM):
     for i,t in enumerate(TYPES):
-        s=d[d.serve_type==t][v]; ax.scatter(np.full(len(s),i)+rng.uniform(-0.15,0.15,len(s)),s,color=COL[t],s=14,edgecolor="none")
-        ax.plot([i-0.25,i+0.25],[s.median()]*2,color="k",lw=1.3)
-    ax.set_xticks(range(3)); ax.set_xticklabels(["Kick","Slice","Flat"],fontsize=8); ax.set_title(LABEL[v],fontsize=8.5); ax.tick_params(labelsize=8)
-    ax.spines[["top","right"]].set_visible(False)
-axs[-1].axis("off"); fig.supylabel("ROM (°)",fontsize=10)
-plt.tight_layout(); plt.savefig("figs/FigureS1.png",dpi=300,bbox_inches="tight"); plt.close()
+        s=d[d.serve_type==t][v]; ax.scatter(np.full(len(s),i)+rng.uniform(-0.17,0.17,len(s)),s,color=COL[t],s=18,edgecolor="white",lw=0.3)
+        ax.plot([i-0.28,i+0.28],[s.median()]*2,color="k",lw=1.6)
+    ax.set_xticks(range(3)); ax.set_xticklabels(["Kick","Slice","Flat"],fontsize=10)
+    ax.set_title("\n".join(textwrap.wrap(LABEL[v],24)),fontsize=10.5); ax.tick_params(axis="y",labelsize=9.5)
+    ax.set_ylabel("ROM (°)",fontsize=9.5); ax.spines[["top","right"]].set_visible(False); ax.set_xlim(-0.6,2.6)
+for ax in axs[len(ROM):]: ax.axis("off")
+plt.tight_layout(h_pad=1.6,w_pad=1.4); plt.savefig("figs/FigureS1.png",dpi=300,bbox_inches="tight"); plt.close()
 print("ok")
