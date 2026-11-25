@@ -39,3 +39,4 @@ Python 3 with numpy, pandas, scipy, scikit-learn 1.9.1 and matplotlib. All rando
 ## Data
 
 The raw marker files, joint-angle files and processed dataset are available from the author on reasonable request. They contain no identifying information.
+
