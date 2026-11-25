@@ -1,32 +1,41 @@
-# Tennis serve classification (revised analysis)
+# Tennis serve classification (kick, slice, flat) from joint range of motion and racket speed
 
-Code for the paper *What Distinguishes a Kick, Slice and Flat Serve? Joint Range of Motion Versus Racket Speed in a Single-Player Pilot Study of Shadow Serves* (Siddhanth Ganesh).
+Code for the paper *What Distinguishes a Kick, Slice and Flat Serve? Joint Range of Motion Versus Racket Speed in a Single-Player Pilot Study of Shadow Serves* (revised version).
 
-## Revised analysis (used in the current paper)
+## What changed in this revision
 
-| File | What it produces |
+The laboratory's joint-angle files (OpenSim `.mot`) were checked against the raw marker files (`.trc`). Eight of the 15 files used for the original reports were copies of other recordings: the five flat files and slice files 2–4 contained kick-serve data. As a result, the joint values for 40 of the 70 serves came from the wrong recordings. That error caused all 19 "implausible" serves and all four duplicated pairs in the first version. The laboratory reran inverse kinematics on the eight recordings. Every joint value was then recomputed from the corrected files, and the analysis now uses all 70 serves without exclusions.
+
+The exclusion-threshold scripts and figures from the earlier version (`figure1_whole_body_compression.py`, `figure3_exclusions_by_type.py`, `figureS1_marker_vs_lab_elbow.py`, `raw_marker_check.py`, `sensitivity_without_forearm.py`) no longer apply and have been removed.
+
+## Files
+
+| Script | What it does |
 |---|---|
-| `revised_analysis.py` | All main results: leave-one-recording-out accuracy, balanced accuracy, precision/recall/F1, macro- and weighted-F1, cluster-bootstrap confidence intervals, the racket-speed-only and joint-ROM-only comparisons, the exclusion-threshold sensitivity tables, and out-of-fold permutation importance. Primary dataset: 43 serves (duplicate pairs removed); sensitivity: 51 serves. |
-| `diff_check.py` | Bootstrap intervals for the change in accuracy when joint ROM variables are added to racket speed. |
-| `speed_check.py` | Racket-speed ranges by serve type and the number of serves in each speed-overlap band. |
-| `make_figures.py` | Figures 4–6 (confusion matrices, permutation importance, racket speed by serve type). |
-| `figure1_whole_body_compression.py`, `figure2_exclusion_thresholds.py`, `figure3_exclusions_by_type.py` | Figures 1–3 (screening of all 70 detected serves for implausible ROM values). The exclusion step is the same as in the earlier version; `figure2_exclusion_thresholds.py` is unchanged and the other two had their labels updated in the revision. |
+| `mocap_io.py` | Shared helpers: reads `.trc` and `.mot` files, detects serves (racket-tip speed peaks > 15 m/s, ≥ 2.5 s apart), computes ROM (max − min from 1.3 s before to 0.9 s after impact) |
+| `check_mot_source.py` | Checks each `.mot` file against its `.trc` recording (length, identical copies) and finds which recording's joint angles reproduce each value in the laboratory's report |
+| `recompute_rom.py` | Recomputes all ROM values from the corrected `.mot` files (`--medfilt` for the five-frame median-filter version) |
+| `compare_original_corrected.py` | Compares the originally reported ROM values with the corrected ones (Figure 1, Supplementary Table S2) |
+| `classification_analysis.py` | Main analysis: leave-one-recording-out cross-validation, random forest and logistic regression, cluster-bootstrap confidence intervals, variable subsets, out-of-fold permutation importance |
+| `binary_and_incremental.py` | Kick against the other two types, slice against flat, the gain from adding ROM to racket speed, and the speed-overlap counts |
+| `sensitivity.py` | Supplementary Table S1: without forearm pronation/supination, median-filtered angles, and trunk and leg ROM only |
+| `make_figures.py` | Figures 1–5 and Supplementary Figure S1 |
 
-All settings are fixed in the code (random forest: 500 trees, `min_samples_leaf=2`, seed 1; logistic regression: L2, C = 1, lbfgs, inside a pipeline with standardisation so scaling is fitted on training folds only). No hyperparameter tuning and no class weighting. Written for Python 3 with scikit-learn 1.9.1, pandas, NumPy and matplotlib.
+## Running
 
-The scripts read `serves_all70_flagged.csv`, the processed serve-level dataset, which is available from the author on request.
+```
+python check_mot_source.py trc/ mot_original/ lab_report.csv
+python recompute_rom.py trc/ mot_corrected/ lab_report.csv
+python recompute_rom.py trc/ mot_corrected/ lab_report.csv --medfilt
+python compare_original_corrected.py serves70_corrected.csv lab_report.csv mot_source_check.csv
+python classification_analysis.py serves70_corrected.csv
+python binary_and_incremental.py
+python sensitivity.py serves70_corrected.csv serves70_medfilt.csv
+python make_figures.py
+```
 
-## Earlier version
+Python 3 with numpy, pandas, scipy, scikit-learn 1.9.1 and matplotlib. All random seeds are fixed. Recordings and files are named `kick_1`–`kick_5`, `slice_1`–`slice_5` and `flat_1`–`flat_5`.
 
-`model_pipeline.py` and `figure4_confusion_matrix.py` to `figure7_knee_threshold_sensitivity.py` are from the earlier version of the analysis (51 serves, impurity-based importance) and are kept for reference only. They do not produce the numbers or figures in the current paper; Figures 4–6 now come from `make_figures.py`.
+## Data
 
-## Added in the revision (response to reviewers)
-
-| File | What it produces |
-|---|---|
-| `raw_marker_check.py` | Checks against the raw Qualisys marker files (.trc): reapplies the laboratory's serve-detection rule, compares racket-tip speed with the laboratory's values (r = 0.999), computes a marker-based elbow flexion ROM for excluded and retained serves, and reports right upper-arm marker loss by recording. Run as `python raw_marker_check.py <folder of .trc files> serves_all70_flagged.csv`. |
-| `sensitivity_without_forearm.py` | Sensitivity analysis without forearm pronation/supination. |
-| `figureS1_marker_vs_lab_elbow.py` | Supplementary Figure S1. |
-| `figure1_whole_body_compression.py`, `figure3_exclusions_by_type.py` | Updated labels: excluded serves are described as having implausible ROM values rather than marker occlusion. |
-
-The raw .trc files are available from the author on request.
+The raw marker files, joint-angle files and processed dataset are available from the author on reasonable request. They contain no identifying information.
